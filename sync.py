@@ -11,19 +11,11 @@ channel = os.environ["TG_CHANNEL"]
 session_str = os.environ.get("TG_SESSION")
 
 client = TelegramClient(StringSession(session_str), api_id, api_hash)
-# Принудительно заставляем библиотеку отдавать текст в формате Markdown
-client.parse_mode = 'markdown' 
+# Установка режима парсинга для получения Markdown-разметки
+client.parse_mode = 'markdown'
 
 OUTPUT_DIR = "notes"
 MEDIA_DIR = os.path.join(OUTPUT_DIR, "media")
-
-def parse_styled_text(msg):
-    """
-    Возвращает текст с Markdown-разметкой.
-    В Telethon для этого используется свойство .raw_text 
-    в паре с установленным client.parse_mode или метод .text.
-    """
-    return msg.text if msg.text else ""
 
 async def main():
     os.makedirs(MEDIA_DIR, exist_ok=True)
@@ -38,8 +30,7 @@ async def main():
     else: existing_notes = {}
 
     async with client:
-        print("--- Синхронизация контента ---")
-        # Мы используем reverse=False и сортировку, чтобы правильно подхватывать дату
+        print("--- Синхронизация ---")
         async for msg in client.iter_messages(channel, limit=20):
             if not msg.text and not msg.media: continue
 
@@ -51,30 +42,22 @@ async def main():
                 if msg.photo:
                     filename += ".jpg"
                 else:
-                    original_name = getattr(msg.media, 'document', None)
                     ext = utils.get_extension(msg.media)
                     filename += ext if ext else ".bin"
 
                 file_path = os.path.join(MEDIA_DIR, filename)
-                
                 if not os.path.exists(file_path):
-                    print(f"Скачиваю медиа для {slug}...")
                     await msg.download_media(file=file_path)
                 
-                media_info = {
-                    "type": "photo" if msg.photo else "document",
-                    "url": f"media/{filename}",
-                    "name": filename
-                }
+                media_info = {"type": "photo" if msg.photo else "document", "url": f"media/{filename}"}
 
-            # ФОРМИРОВАНИЕ ЗАМЕТКИ
-            # Исправлена дата (ISO format для парсинга временем) и добавлена запятая
+            # Сохраняем ISO формат даты для корректного отображения времени
             note_data = {
                 "id": msg.id,
                 "slug": slug,
                 "date": msg.date.isoformat(), 
-                "content": parse_styled_text(msg),
-                "media": media_info, # Была пропущена запятая
+                "content": msg.text if msg.text else "",
+                "media": media_info,
                 "tg_link": f"https://t.me/{channel}/{msg.id}"
             }
 
@@ -85,15 +68,9 @@ async def main():
                 "id": msg.id,
                 "slug": slug,
                 "date": msg.date.isoformat(),
-                "title": (msg.text or "Вложение").split("\n")[0][:60],
-                "has_media": bool(media_info)
+                "title": (msg.text or "Вложение").split("\n")[0][:60]
             }
 
     sorted_notes = sorted(existing_notes.values(), key=lambda x: x['id'], reverse=True)
     with open(index_path, "w", encoding="utf-8") as f:
         json.dump({"notes": sorted_notes}, f, ensure_ascii=False, indent=2)
-    
-    print(f"Обновлено. Всего записей: {len(sorted_notes)}")
-
-if __name__ == "__main__":
-    asyncio.run(main())
