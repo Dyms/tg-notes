@@ -1,8 +1,9 @@
 {
   "id": 597,
-  "slug": "log-597",
   "date": "2026-04-08T13:21:43+00:00",
   "content": "Текс с цитатой\n<blockquote>git config <a href=\"user.name\">user.name</a> &quot;bot&quot;\n          git config <a href=\"user.email\">user.email</a> &quot;<a href=\"mailto:bot@example.com\">bot@example.com</a>&quot;\n          git add .  # Важно: точка добавит и новые JSON, и файлы в папке media\n          git commit -m &quot;auto update content and media&quot; || exit 0\n          git push</blockquote>",
-  "media": null,
-  "tg_link": "https://t.me/DBogatov_ogorod/597"
+  "media": [],
+  "tags": [],
+  "tg_link": "https://t.me/DBogatov_ogorod/597",
+  "slug": "log-597"
 }

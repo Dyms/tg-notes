@@ -1,12 +1,15 @@
 {
   "id": 579,
-  "slug": "log-579",
   "date": "2020-03-02T16:28:55+00:00",
   "content": "Drinking a Grevensteiner Naturtrübes Helles (blue/blau) by Brauerei VELTINS - <a href=\"https://t.co/bjiKZjpIKf\">https://t.co/bjiKZjpIKf</a>",
-  "media": {
-    "type": "photo",
-    "url": "media/log-579.jpg",
-    "too_large": false
-  },
-  "tg_link": "https://t.me/DBogatov_ogorod/579"
+  "media": [
+    {
+      "type": "photo",
+      "url": "media/media-579.jpg",
+      "too_large": false
+    }
+  ],
+  "tags": [],
+  "tg_link": "https://t.me/DBogatov_ogorod/579",
+  "slug": "log-579"
 }

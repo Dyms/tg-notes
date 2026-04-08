@@ -1,12 +1,15 @@
 {
   "id": 529,
-  "slug": "log-529",
   "date": "2018-05-19T09:22:28+00:00",
   "content": "",
-  "media": {
-    "type": "photo",
-    "url": "media/log-529.jpg",
-    "too_large": false
-  },
-  "tg_link": "https://t.me/DBogatov_ogorod/529"
+  "media": [
+    {
+      "type": "photo",
+      "url": "media/media-529.jpg",
+      "too_large": false
+    }
+  ],
+  "tags": [],
+  "tg_link": "https://t.me/DBogatov_ogorod/529",
+  "slug": "log-529"
 }

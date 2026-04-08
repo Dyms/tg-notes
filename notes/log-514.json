@@ -1,12 +1,17 @@
 {
   "id": 514,
-  "slug": "log-514",
   "date": "2018-03-16T20:19:00+00:00",
   "content": "Drinking a Tsarina Esra by @molenbier - <a href=\"https://t.co/Q4e0AQTKf4\">https://t.co/Q4e0AQTKf4</a> #photo <a href=\"https://t.co/G2j1RF6GhO\">https://t.co/G2j1RF6GhO</a>",
-  "media": {
-    "type": "photo",
-    "url": "media/log-514.jpg",
-    "too_large": false
-  },
-  "tg_link": "https://t.me/DBogatov_ogorod/514"
+  "media": [
+    {
+      "type": "photo",
+      "url": "media/media-514.jpg",
+      "too_large": false
+    }
+  ],
+  "tags": [
+    "photo"
+  ],
+  "tg_link": "https://t.me/DBogatov_ogorod/514",
+  "slug": "log-514"
 }

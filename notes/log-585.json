@@ -1,12 +1,15 @@
 {
   "id": 585,
-  "slug": "log-585",
   "date": "2020-03-02T18:21:00+00:00",
   "content": "Drinking a Framboise by Brouwerij Lindemans - <a href=\"https://t.co/N8OyeLvaYh\">https://t.co/N8OyeLvaYh</a>",
-  "media": {
-    "type": "photo",
-    "url": "media/log-585.jpg",
-    "too_large": false
-  },
-  "tg_link": "https://t.me/DBogatov_ogorod/585"
+  "media": [
+    {
+      "type": "photo",
+      "url": "media/media-585.jpg",
+      "too_large": false
+    }
+  ],
+  "tags": [],
+  "tg_link": "https://t.me/DBogatov_ogorod/585",
+  "slug": "log-585"
 }
