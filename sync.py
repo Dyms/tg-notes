@@ -13,7 +13,8 @@ channel = os.environ["TG_CHANNEL"]
 session_str = os.environ.get("TG_SESSION")
 
 # Конфигурация WordPress
-WP_URL = "https://dbogatov.ru/wp-json/wp/v2"
+WP_URL = "https://dbogatov.ru/wp-json/wp/v2/tg_post"
+
 WP_USER = os.environ["WP_USER"]
 WP_PASS = os.environ["WP_PASS"]
 
