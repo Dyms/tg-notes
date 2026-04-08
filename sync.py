@@ -72,6 +72,7 @@ async def main():
                 "date": str(msg.date.date()),
                 "content": parse_styled_text(msg), # Здесь теперь текст с форматированием
                 "media": media_info
+                "tg_link": f"https://t.me/{channel}/{msg.id}"
             }
 
             with open(os.path.join(OUTPUT_DIR, f"{slug}.json"), "w", encoding="utf-8") as f:
