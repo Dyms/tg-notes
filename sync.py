@@ -8,7 +8,7 @@ from telethon import utils
 
 # Данные авторизации из окружения
 api_id = int(os.environ["TG_API_ID"])
-api_hash = os.environ["TG_API_HASH"])
+api_hash = os.environ["TG_API_HASH"]
 channel = os.environ["TG_CHANNEL"]
 session_str = os.environ.get("TG_SESSION")
 
