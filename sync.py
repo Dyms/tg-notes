@@ -6,19 +6,21 @@ from telethon import TelegramClient
 from telethon.sessions import StringSession
 from telethon import utils
 
+# Данные авторизации из окружения
 api_id = int(os.environ["TG_API_ID"])
-api_hash = os.environ["TG_API_HASH"]
+api_hash = os.environ["TG_API_HASH"])
 channel = os.environ["TG_CHANNEL"]
 session_str = os.environ.get("TG_SESSION")
 
 client = TelegramClient(StringSession(session_str), api_id, api_hash)
-client.parse_mode = 'html'
+client.parse_mode = 'html' # Сохраняем оригинальную разметку Telegram
 
 OUTPUT_DIR = "notes"
 MEDIA_DIR = os.path.join(OUTPUT_DIR, "media")
-MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50 MB в байтах
+MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50 MB
 
 async def main():
+    # Полная очистка перед синхронизацией для удаления дублей и лишних файлов
     if os.path.exists(OUTPUT_DIR):
         shutil.rmtree(OUTPUT_DIR)
     
@@ -27,6 +29,7 @@ async def main():
     existing_notes = {}
 
     async with client:
+        print("--- Синхронизация: Режим зеркала (последние 20) ---")
         async for msg in client.iter_messages(channel, limit=20):
             if not msg.text and not msg.media: continue
 
@@ -35,8 +38,9 @@ async def main():
 
             if msg.media:
                 is_video = bool(msg.video)
-                # Проверка размера для видео
-                is_too_large = is_video and msg.file and msg.file.size > MAX_VIDEO_SIZE
+                # Проверка размера видео
+                file_size = msg.file.size if msg.file else 0
+                is_too_large = is_video and file_size > MAX_VIDEO_SIZE
                 
                 filename = f"{slug}"
                 if msg.photo:
@@ -49,7 +53,7 @@ async def main():
 
                 file_path = os.path.join(MEDIA_DIR, filename)
                 
-                # Загружаем, если это не слишком большое видео
+                # Загружаем только если это фото или видео в пределах лимита
                 if not is_too_large:
                     await msg.download_media(file=file_path)
                 
@@ -78,9 +82,12 @@ async def main():
                 "title": (msg.message or "Вложение").split("\n")[0][:60]
             }
 
+    # Сохраняем индекс
     sorted_notes = sorted(existing_notes.values(), key=lambda x: x['id'], reverse=True)
     with open(index_path, "w", encoding="utf-8") as f:
         json.dump({"notes": sorted_notes}, f, ensure_ascii=False, indent=2)
+    
+    print(f"Готово. Актуальных записей: {len(sorted_notes)}")
 
 if __name__ == "__main__":
     asyncio.run(main())
