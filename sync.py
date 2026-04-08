@@ -28,9 +28,41 @@ async def main():
     all_messages = []
 
     async with client:
-        # Собираем сообщения
+        # Убеждаемся, что мы подключены
+        if not await client.is_user_authorized():
+            print("Ошибка: Клиент не авторизован")
+            return
+
+        print("--- Получение сообщений ---")
         async for msg in client.iter_messages(channel, limit=30):
             all_messages.append(msg)
+
+        processed_groups = {} 
+        
+        print(f"--- Обработка медиа ({len(all_messages)} сообщений) ---")
+        for msg in all_messages:
+            # ... (логика тегов и group_id остается прежней) ...
+            
+            # В блоке обработки медиа:
+            if msg.media:
+                is_video = bool(msg.video)
+                file_size = msg.file.size if msg.file else 0
+                is_too_large = is_video and file_size > MAX_VIDEO_SIZE
+                
+                slug = f"media-{msg.id}"
+                ext = ".mp4" if is_video and not is_too_large else (".jpg" if msg.photo else utils.get_extension(msg.media))
+                filename = f"{slug}{ext}"
+                file_path = os.path.join(MEDIA_DIR, filename)
+
+                if not is_too_large:
+                    # ПРОВЕРКА СОЕДИНЕНИЯ ПЕРЕД СКАЧИВАНИЕМ
+                    if not client.is_connected():
+                        await client.connect()
+                    
+                    try:
+                        await msg.download_media(file=file_path)
+                    except Exception as e:
+                        print(f"Ошибка при скачивании {filename}: {e}")
 
     processed_groups = {} # Для группировки альбомов
     final_notes = []
