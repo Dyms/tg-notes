@@ -1,0 +1,7 @@
+{
+  "id": 597,
+  "slug": "log-597",
+  "date": "2026-04-08",
+  "content": "Текс с цитатой\ngit config user.name \"bot\"\n          git config user.email \"bot@example.com\"\n          git add .  # Важно: точка добавит и новые JSON, и файлы в папке media\n          git commit -m \"auto update content and media\" || exit 0\n          git push",
+  "media": null
+}

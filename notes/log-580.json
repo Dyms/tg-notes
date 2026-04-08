@@ -2,10 +2,10 @@
   "id": 580,
   "slug": "log-580",
   "date": "2020-03-02",
-  "blocks": [
-    {
-      "type": "text",
-      "content": "I just earned the 'Belgian Holiday (Level 2)' badge on @untappd! https://t.co/TK1WQQiVkx"
-    }
-  ]
+  "content": "I just earned the 'Belgian Holiday (Level 2)' badge on @untappd! https://t.co/TK1WQQiVkx",
+  "media": {
+    "type": "photo",
+    "url": "media/log-580.jpg",
+    "name": "log-580.jpg"
+  }
 }
