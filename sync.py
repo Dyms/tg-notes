@@ -25,25 +25,39 @@ async def main():
     os.makedirs(MEDIA_DIR, exist_ok=True)
     
     index_path = os.path.join(OUTPUT_DIR, "index.json")
-    all_messages = []
+    
+    processed_groups = {}
+    final_notes = []
 
     async with client:
-        # Убеждаемся, что мы подключены
-        if not await client.is_user_authorized():
-            print("Ошибка: Клиент не авторизован")
-            return
-
-        print("--- Получение сообщений ---")
-        async for msg in client.iter_messages(channel, limit=30):
-            all_messages.append(msg)
-
-        processed_groups = {} 
+        print("--- Начинаю синхронизацию ---")
         
-        print(f"--- Обработка медиа ({len(all_messages)} сообщений) ---")
-        for msg in all_messages:
-            # ... (логика тегов и group_id остается прежней) ...
+        # Скачиваем сообщения и медиа ОДНОВРЕМЕННО
+        async for msg in client.iter_messages(channel, limit=30):
+            if not msg.text and not msg.media: continue
+
+            # Уникальный ключ группы
+            group_id = msg.grouped_id if msg.grouped_id else f"single-{msg.id}"
             
-            # В блоке обработки медиа:
+            # Извлекаем теги
+            tags = re.findall(r'#(\w+)', msg.text) if msg.text else []
+            
+            if group_id not in processed_groups:
+                processed_groups[group_id] = {
+                    "id": msg.id,
+                    "date": msg.date.isoformat(),
+                    "content": msg.text if msg.text else "",
+                    "media": [],
+                    "tags": tags,
+                    "tg_link": f"https://t.me/{channel}/{msg.id}"
+                }
+            else:
+                # Если текст в альбоме пришел в другом сообщении — сохраняем его
+                if not processed_groups[group_id]["content"] and msg.text:
+                    processed_groups[group_id]["content"] = msg.text
+                    processed_groups[group_id]["tags"] = tags
+
+            # Обработка медиа прямо в потоке
             if msg.media:
                 is_video = bool(msg.video)
                 file_size = msg.file.size if msg.file else 0
@@ -55,63 +69,21 @@ async def main():
                 file_path = os.path.join(MEDIA_DIR, filename)
 
                 if not is_too_large:
-                    # ПРОВЕРКА СОЕДИНЕНИЯ ПЕРЕД СКАЧИВАНИЕМ
-                    if not client.is_connected():
-                        await client.connect()
-                    
                     try:
+                        print(f"Скачиваю: {filename}")
                         await msg.download_media(file=file_path)
                     except Exception as e:
-                        print(f"Ошибка при скачивании {filename}: {e}")
+                        print(f"Ошибка скачивания {filename}: {e}")
+                
+                processed_groups[group_id]["media"].append({
+                    "type": "video" if is_video else "photo",
+                    "url": f"media/{filename}" if not is_too_large else None,
+                    "too_large": is_too_large
+                })
+                # Небольшая пауза, чтобы Telegram не разорвал соединение
+                await asyncio.sleep(0.2)
 
-    processed_groups = {} # Для группировки альбомов
-    final_notes = []
-
-    for msg in all_messages:
-        # Извлекаем хештеги
-        tags = []
-        if msg.text:
-            tags = re.findall(r'#(\w+)', msg.text)
-        
-        # Уникальный ключ для заметки (ID сообщения или grouped_id)
-        group_id = msg.grouped_id if msg.grouped_id else f"single-{msg.id}"
-        
-        if group_id not in processed_groups:
-            processed_groups[group_id] = {
-                "id": msg.id,
-                "date": msg.date.isoformat(),
-                "content": msg.text if msg.text else "",
-                "media": [],
-                "tags": tags,
-                "tg_link": f"https://t.me/{channel}/{msg.id}"
-            }
-        else:
-            # Если это часть альбома, дополняем текст (если его нет в первом элементе)
-            if not processed_groups[group_id]["content"] and msg.text:
-                processed_groups[group_id]["content"] = msg.text
-                processed_groups[group_id]["tags"] = tags
-
-        # Обработка медиа
-        if msg.media:
-            is_video = bool(msg.video)
-            file_size = msg.file.size if msg.file else 0
-            is_too_large = is_video and file_size > MAX_VIDEO_SIZE
-            
-            slug = f"media-{msg.id}"
-            ext = ".mp4" if is_video and not is_too_large else (".jpg" if msg.photo else utils.get_extension(msg.media))
-            filename = f"{slug}{ext}"
-            file_path = os.path.join(MEDIA_DIR, filename)
-
-            if not is_too_large:
-                await msg.download_media(file=file_path)
-            
-            processed_groups[group_id]["media"].append({
-                "type": "video" if is_video else "photo",
-                "url": f"media/{filename}" if not is_too_large else None,
-                "too_large": is_too_large
-            })
-
-    # Сохраняем каждый JSON
+    # После закрытия 'async with client' сохраняем JSON файлы
     for g_id, data in processed_groups.items():
         slug = f"log-{data['id']}"
         data["slug"] = slug
@@ -125,10 +97,11 @@ async def main():
             "tags": data["tags"]
         })
 
-    # Сортировка и индекс
     final_notes.sort(key=lambda x: x['id'], reverse=True)
     with open(index_path, "w", encoding="utf-8") as f:
         json.dump({"notes": final_notes[:20]}, f, ensure_ascii=False, indent=2)
+    
+    print(f"Успешно синхронизировано: {len(final_notes)} записей")
 
 if __name__ == "__main__":
     asyncio.run(main())
