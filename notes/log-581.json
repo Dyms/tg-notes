@@ -5,7 +5,8 @@
   "content": "Drinking a RaspBarista Chocolate Quad by Kasteel Brouwerij Vanhonsebrouck - <a href=\"https://t.co/5i7xBXhNHa\">https://t.co/5i7xBXhNHa</a>",
   "media": {
     "type": "photo",
-    "url": "media/log-581.jpg"
+    "url": "media/log-581.jpg",
+    "too_large": false
   },
   "tg_link": "https://t.me/DBogatov_ogorod/581"
 }

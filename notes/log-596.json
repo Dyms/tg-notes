@@ -5,7 +5,8 @@
   "content": "<strong>Жирный</strong> текст <u>важный</u>",
   "media": {
     "type": "photo",
-    "url": "media/log-596.jpg"
+    "url": "media/log-596.jpg",
+    "too_large": false
   },
   "tg_link": "https://t.me/DBogatov_ogorod/596"
 }

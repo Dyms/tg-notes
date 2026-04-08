@@ -5,7 +5,8 @@
   "content": "Drinking a Grevensteiner Naturtrübes Helles (blue/blau) by Brauerei VELTINS - <a href=\"https://t.co/bjiKZjpIKf\">https://t.co/bjiKZjpIKf</a>",
   "media": {
     "type": "photo",
-    "url": "media/log-579.jpg"
+    "url": "media/log-579.jpg",
+    "too_large": false
   },
   "tg_link": "https://t.me/DBogatov_ogorod/579"
 }

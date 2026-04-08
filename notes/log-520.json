@@ -5,7 +5,8 @@
   "content": "Drinking an American Barley Wine by @KeesBubberman - <a href=\"https://t.co/yb5ik7qCWw\">https://t.co/yb5ik7qCWw</a> #photo",
   "media": {
     "type": "photo",
-    "url": "media/log-520.jpg"
+    "url": "media/log-520.jpg",
+    "too_large": false
   },
   "tg_link": "https://t.me/DBogatov_ogorod/520"
 }

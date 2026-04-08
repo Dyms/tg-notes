@@ -5,7 +5,8 @@
   "content": "Drinking a Red Hot Chili Monk by DaLi Brewery - <a href=\"https://t.co/VWQYYKX9xo\">https://t.co/VWQYYKX9xo</a> #photo",
   "media": {
     "type": "photo",
-    "url": "media/log-516.jpg"
+    "url": "media/log-516.jpg",
+    "too_large": false
   },
   "tg_link": "https://t.me/DBogatov_ogorod/516"
 }

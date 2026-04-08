@@ -5,7 +5,8 @@
   "content": "Drinking a Rodenbach Grand Cru by @rodenbachbeer - <a href=\"https://t.co/eLK7MdYMAC\">https://t.co/eLK7MdYMAC</a> #photo",
   "media": {
     "type": "photo",
-    "url": "media/log-504.jpg"
+    "url": "media/log-504.jpg",
+    "too_large": false
   },
   "tg_link": "https://t.me/DBogatov_ogorod/504"
 }
