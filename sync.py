@@ -11,8 +11,7 @@ channel = os.environ["TG_CHANNEL"]
 session_str = os.environ.get("TG_SESSION")
 
 client = TelegramClient(StringSession(session_str), api_id, api_hash)
-# Используем HTML, так как Telegram лучше передает <u> и <blockquote> через него
-client.parse_mode = 'html'
+client.parse_mode = 'html' # Переключаемся на HTML для сохранения <u> и <blockquote>
 
 OUTPUT_DIR = "notes"
 MEDIA_DIR = os.path.join(OUTPUT_DIR, "media")
@@ -54,8 +53,8 @@ async def main():
             note_data = {
                 "id": msg.id,
                 "slug": slug,
-                "date": msg.date.isoformat(), # Сохраняем полное время
-                "content": msg.text if msg.text else "", # Здесь теперь будет HTML-разметка
+                "date": msg.date.isoformat(), # Сохраняем время полностью
+                "content": msg.text if msg.text else "", # Теперь здесь будет чистый HTML
                 "media": media_info,
                 "tg_link": f"https://t.me/{channel}/{msg.id}"
             }
