@@ -1,11 +1,12 @@
 {
   "id": 596,
   "slug": "log-596",
-  "date": "2026-04-08",
+  "date": "2026-04-08T13:20:59+00:00",
   "content": "**Жирный** текст важный",
   "media": {
     "type": "photo",
     "url": "media/log-596.jpg",
     "name": "log-596.jpg"
-  }
+  },
+  "tg_link": "https://t.me/DBogatov_ogorod/596"
 }
