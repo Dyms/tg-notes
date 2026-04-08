@@ -11,13 +11,18 @@ channel = os.environ["TG_CHANNEL"]
 session_str = os.environ.get("TG_SESSION")
 
 client = TelegramClient(StringSession(session_str), api_id, api_hash)
+# Принудительно заставляем библиотеку отдавать текст в формате Markdown
+client.parse_mode = 'markdown' 
+
 OUTPUT_DIR = "notes"
 MEDIA_DIR = os.path.join(OUTPUT_DIR, "media")
 
 def parse_styled_text(msg):
-    """Превращает форматированный текст сообщения в HTML-подобную структуру или Markdown."""
-    # Telethon может отдавать текст сразу в Markdown или HTML
-    # Мы будем использовать Markdown для хранения в JSON, это универсально
+    """
+    Возвращает текст с Markdown-разметкой.
+    В Telethon для этого используется свойство .raw_text 
+    в паре с установленным client.parse_mode или метод .text.
+    """
     return msg.text if msg.text else ""
 
 async def main():
@@ -34,21 +39,18 @@ async def main():
 
     async with client:
         print("--- Синхронизация контента ---")
+        # Мы используем reverse=False и сортировку, чтобы правильно подхватывать дату
         async for msg in client.iter_messages(channel, limit=20):
-            # Пропускаем, если нет ни текста, ни медиа
             if not msg.text and not msg.media: continue
 
             slug = f"log-{msg.id}"
             media_info = None
 
-            # ОБРАБОТКА ВЛОЖЕНИЙ (Фото и Файлы)
             if msg.media:
-                # Определяем расширение и имя файла
                 filename = f"{slug}"
                 if msg.photo:
                     filename += ".jpg"
                 else:
-                    # Для документов пытаемся взять оригинальное имя
                     original_name = getattr(msg.media, 'document', None)
                     ext = utils.get_extension(msg.media)
                     filename += ext if ext else ".bin"
@@ -66,12 +68,13 @@ async def main():
                 }
 
             # ФОРМИРОВАНИЕ ЗАМЕТКИ
+            # Исправлена дата (ISO format для парсинга временем) и добавлена запятая
             note_data = {
                 "id": msg.id,
                 "slug": slug,
-                "date": str(msg.date.date()),
-                "content": parse_styled_text(msg), # Здесь теперь текст с форматированием
-                "media": media_info
+                "date": msg.date.isoformat(), 
+                "content": parse_styled_text(msg),
+                "media": media_info, # Была пропущена запятая
                 "tg_link": f"https://t.me/{channel}/{msg.id}"
             }
 
@@ -81,7 +84,7 @@ async def main():
             existing_notes[msg.id] = {
                 "id": msg.id,
                 "slug": slug,
-                "date": str(msg.date.date()),
+                "date": msg.date.isoformat(),
                 "title": (msg.text or "Вложение").split("\n")[0][:60],
                 "has_media": bool(media_info)
             }
