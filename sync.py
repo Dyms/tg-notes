@@ -18,14 +18,13 @@ WP_PASS = os.environ["WP_PASS"]
 client = TelegramClient(StringSession(session_str), api_id, api_hash)
 auth = (WP_USER, WP_PASS)
 
-async def upload_to_wp_media(msg, post_id_placeholder=None):
+async def upload_to_wp_media(msg):
     file_path = await msg.download_media()
     if not file_path: return None, None
     filename = os.path.basename(file_path)
     
     with open(file_path, 'rb') as f:
         headers = {'Content-Disposition': f'attachment; filename={filename}'}
-        # Загружаем медиа
         res = requests.post(f"{WP_BASE_URL}/media", auth=auth, files={'file': f}, headers=headers)
     
     if os.path.exists(file_path): os.remove(file_path)
@@ -44,10 +43,11 @@ async def main():
         for msg in messages:
             if not msg.message and not msg.media: continue
             gid = msg.grouped_id if msg.grouped_id else f"single-{msg.id}"
+            
             if gid not in groups:
-                # Получаем HTML из телеграма
+                # Получаем HTML-разметку из Telegram
                 raw_html = html.unparse(msg.message, msg.entities) if msg.message else ""
-                # ФИКС: Заменяем переносы строк на <br />, чтобы форматирование не слипалось
+                # Фикс форматирования: заменяем переносы на <br />
                 raw_html = raw_html.replace('\n', '<br />')
                 groups[gid] = {"id": msg.id, "text": raw_html, "media": [], "date": msg.date}
             if msg.media:
@@ -72,10 +72,12 @@ async def main():
                         media_html += f'<img src="{m_url}" style="width:100%; border-radius:15px; margin-bottom:20px;">'
                         if not featured_image_id: featured_image_id = m_id
 
-            footer = f'<div class="tg-source" style="margin-top:20px; border-top:1px solid #eee; padding-top:10px;"><a href="https://t.me/{channel}/{data["id"]}">Original Telegram Post</a></div>'
+            source_link = f"https://t.me/{channel}/{data['id']}"
+            footer = f'<div class="tg-source" style="margin-top:20px; border-top:1px solid #eee; padding-top:10px; font-size:12px;"><a href="{source_link}" target="_blank">Original Telegram Post</a></div>'
             
             payload = {
-                "title": re.sub('<[^<]+?>', '', data["text"]).split('<br')[0][:60].strip() or "Note",
+                # Очищаем заголовок от тегов для корректного отображения в списке
+                "title": re.sub('<[^<]+?>', '', data["text"]).split('<br')[0][:60].strip() or f"Post {data['id']}",
                 "content": f"{media_html}<div class='tg-body'>{data['text']}</div>{footer}",
                 "status": "publish",
                 "slug": slug,
@@ -83,14 +85,18 @@ async def main():
                 "date": data["date"].isoformat()
             }
             
-            # Создаем пост
+            # 1. Создаем пост
             post_res = requests.post(f"{WP_BASE_URL}/tg_post", auth=auth, json=payload)
             
-            # Привязываем медиа к посту (чтобы удаление работало корректно)
+            # 2. Если пост создан, привязываем к нему загруженные медиафайлы
             if post_res.status_code == 201:
                 post_id = post_res.json()['id']
                 for m_id in uploaded_ids:
+                    # Привязка файла к посту позволяет работать функции автоматического удаления
                     requests.post(f"{WP_BASE_URL}/media/{m_id}", auth=auth, json={"post": post_id})
+                print(f"Done: {slug}")
+            else:
+                print(f"Error creating post {slug}: {post_res.text}")
 
             await asyncio.sleep(1)
 
