@@ -1,12 +1,12 @@
-#name: Telegram to WordPress Sync
+name: Telegram to WordPress Sync
 
-#on:
-#  schedule:
-#    - cron: "0 * * * *" # Раз в час
-#  workflow_dispatch:
+on:
+  schedule:
+    - cron: "0 * * * *" # Раз в час
+  workflow_dispatch:
 
-#permissions:
-#  contents: read
+permissions:
+  contents: read
 
 #env:
   TG_API_ID: ${{ secrets.TG_API_ID }}
